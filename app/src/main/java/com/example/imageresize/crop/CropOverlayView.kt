@@ -1,4 +1,5 @@
-package com.example.imageresize.cropactivity
+package com.example.imageresize
+
 
 import android.content.Context
 import android.graphics.Canvas

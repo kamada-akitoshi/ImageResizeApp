@@ -8,11 +8,12 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
-
+import android.widget.CheckBox
 class CropActivity : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
@@ -20,7 +21,7 @@ class CropActivity : AppCompatActivity() {
     private lateinit var cropButton: Button
     private lateinit var originalUri: Uri
     private lateinit var bitmap: Bitmap
-
+    private lateinit var fixedRatioCheckBox: CheckBox
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crop)
@@ -29,6 +30,15 @@ class CropActivity : AppCompatActivity() {
         cropOverlay = findViewById(R.id.cropOverlay)
         cropButton = findViewById(R.id.cropButton)
 
+        fixedRatioCheckBox = findViewById(R.id.fixedRatioCheckBox)
+
+        // チェックボックスの状態変更でCropOverlayViewに反映
+        fixedRatioCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            cropOverlay.setFixedRatioMode(isChecked)
+            if (isChecked) {
+                cropOverlay.setFixedRatio(4f / 3f)
+            }
+        }
         val uriStr = intent.getStringExtra("imageUri")
         if (uriStr == null) {
             Toast.makeText(this, "画像が見つかりません", Toast.LENGTH_SHORT).show()
@@ -82,7 +92,7 @@ class CropActivity : AppCompatActivity() {
     }
 
     private fun saveCroppedImage(bitmap: Bitmap) {
-        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
         val fileName = "${dateFormat.format(Date())}_cropped.jpg"
         val outputDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "ResizedImages")
         if (!outputDir.exists()) outputDir.mkdirs()
