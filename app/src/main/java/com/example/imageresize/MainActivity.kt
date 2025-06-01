@@ -1,21 +1,23 @@
 package com.example.imageresize
 
-import android.graphics.Bitmap
+import android.content.Intent
+import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.net.Uri
-import android.widget.Button
-import android.widget.Toast
-import android.graphics.BitmapFactory
 import android.os.Environment
 import android.provider.OpenableColumns
+import android.widget.Button
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import java.io.File
 import java.io.FileOutputStream
-import androidx.activity.result.contract.ActivityResultContracts
-import android.app.AlertDialog
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.app.AlertDialog
+import com.example.imageresize.CropActivity
+import android.graphics.Bitmap
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,6 +39,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // クロップ用（必ずここでメンバ変数として宣言）
+    private val pickImageForCropLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            val intent = Intent(this, CropActivity::class.java).apply {
+                putExtra("imageUri", it.toString())
+            }
+            startActivity(intent)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -48,9 +62,15 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.changeExtensionButton).setOnClickListener {
             pickImageForExtensionLauncher.launch("image/*")
         }
+
+        findViewById<Button>(R.id.cropImageButton).setOnClickListener {
+            pickImageForCropLauncher.launch("image/*")
+        }
     }
 
-    private fun resizeAndSaveImage(imageUri: Uri) {
+
+
+private fun resizeAndSaveImage(imageUri: Uri) {
         val inputStream = contentResolver.openInputStream(imageUri)
         val originalBitmap = BitmapFactory.decodeStream(inputStream)
         inputStream?.close()
@@ -70,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         val extension = fileName.substringAfterLast('.', "jpg")
         val baseName = fileName.substringBeforeLast('.', "image")
 
-        val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault())
         val dateStr = dateFormat.format(Date())
         val resizedFileName = "${dateStr}_resized.$extension"
 
@@ -115,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         val fileName = getFileNameFromUri(imageUri)
         val baseName = fileName.substringBeforeLast('.', "image")
 
-        val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault())
         val dateStr = dateFormat.format(Date())
 
         val newFileName = "${dateStr}_converted.$targetExtension"

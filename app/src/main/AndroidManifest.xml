@@ -31,6 +31,9 @@
             </intent-filter>
         </activity>
 
+        <!-- ✅ CropActivity をここに追加 -->
+        <activity android:name=".CropActivity" />
+
     </application>
 
 </manifest>

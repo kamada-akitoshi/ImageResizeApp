@@ -73,4 +73,6 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0") // 画像読み込み
     kapt("com.github.bumptech.glide:compiler:4.16.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.github.CanHub:Android-Image-Cropper:4.4.0") // ← 正しい
+
 }
