@@ -19,15 +19,18 @@ import android.app.AlertDialog
 import android.graphics.Bitmap
 
 class MainActivity : AppCompatActivity() {
+    // 追加: 選択した縮小率（初期値は50%）
+    private var selectedScalePercent = 50
 
-    // 画像リサイズ用
+    // 画像選択
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            resizeAndSaveImage(it)
+            showScaleSelectDialog(it)  // 縮小率選択ダイアログ表示に変更
         }
     }
+
 
     // 拡張子変更用
     private val pickImageForExtensionLauncher = registerForActivityResult(
@@ -67,17 +70,38 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // 縮小率選択ダイアログ
+    private fun showScaleSelectDialog(imageUri: Uri) {
+        val scaleOptions = arrayOf("20%", "50%", "80%")
+        AlertDialog.Builder(this)
+            .setTitle("縮小率を選択してください")
+            .setItems(scaleOptions) { _, which ->
+                selectedScalePercent = when (which) {
+                    0 -> 20
+                    1 -> 50
+                    2 -> 80
+                    else -> 50
+                }
+                resizeAndSaveImage(imageUri)
+            }
+            .setNegativeButton("キャンセル", null)
+            .show()
+    }
 
-
-private fun resizeAndSaveImage(imageUri: Uri) {
+    private fun resizeAndSaveImage(imageUri: Uri) {
         val inputStream = contentResolver.openInputStream(imageUri)
         val originalBitmap = BitmapFactory.decodeStream(inputStream)
         inputStream?.close()
 
+        // 縮小率に合わせてBitmapをリサイズ
+        val width = originalBitmap.width * selectedScalePercent / 100
+        val height = originalBitmap.height * selectedScalePercent / 100
+        val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, width, height, true)
+
         val resizedFile = createResizedFile(imageUri)
 
         val outputStream = FileOutputStream(resizedFile)
-        originalBitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
         outputStream.flush()
         outputStream.close()
 
