@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.app.AlertDialog
-import com.example.imageresize.CropActivity
 import android.graphics.Bitmap
 
 class MainActivity : AppCompatActivity() {
