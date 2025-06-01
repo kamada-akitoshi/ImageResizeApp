@@ -13,6 +13,3 @@ A simple Android app that provides essential image manipulation tools:
 - ✂️ **Crop Image**  
   Crop a selected image to focus on a specific region.
 
----
-
-Built with Kotlin and Jetpack for modern Android development.
